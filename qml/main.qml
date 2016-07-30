@@ -15,23 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
-import QtQuick.Window 2.0
-import QtQuick.Controls 1.0
-import Qt.labs.controls 1.0
+import QtQuick 2.4
+import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
 import LunaNext.Common 0.1
+import QtQuick.Window 2.0
 
 Window {
-    id: window
-
+    id: root
     width: Settings.displayWidth
     height: Settings.displayHeight
+
+    Component.onCompleted:
+    {
+        root.visible = true
+    }
 
     Button {
         id: toggleButton
         text: "Turn Flashlight On"
         anchors.bottom: brightnessSlider.top
+        anchors.bottomMargin: Units.gu(4)
         anchors.horizontalCenter: parent.horizontalCenter
+        height: Units.gu(7)
 
         MouseArea{
             anchors.fill: parent
@@ -39,28 +45,45 @@ Window {
                 if(toggleButton.text==="Turn Flashlight On")
                 {
                     toggleButton.text="Turn Flashlight Off"
-                    LedsAdapter.ledSet(brightnessSlider.value);
+                    Leds.ledSet(brightnessSlider.value);
                 }
                 else
                 {
                     toggleButton.text="Turn Flashlight On"
-                    LedsAdapter.stopAll();
+                    Leds.ledSet(0);
+                    Leds.stopAll();
                 }
             }
 
         }
     }
 
-
     Slider
     {
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
         id: brightnessSlider
-        from: 0
-        to: 200
-        stepSize: 0.01
-        snapMode: Slider.SnapAlways
+        minimumValue: 0
+        maximumValue: 255
+        stepSize: 1
+        updateValueWhileDragging: true
+        style: SliderStyle {
+            groove: Rectangle {
+                implicitWidth: 600
+                implicitHeight: Units.gu(4)
+                color: "gray"
+                radius: 8
+            }
+            handle:  Rectangle {
+                anchors.centerIn: parent
+                color: control.pressed ? "white" : "lightgray"
+                border.color: "gray"
+                border.width: 2
+                implicitWidth: Units.gu(4)
+                implicitHeight: Units.gu(4)
+                radius: 12
+            }
+        }
     }
 
     Text
